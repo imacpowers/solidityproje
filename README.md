@@ -1,4 +1,5 @@
 The following functionalities were chosen in a bid to better represent the stackup platform in a contract form.
+
 "Date and time functionalities"
 
 The start date and end date functionalities were added to the contract, this was achieved by including both "startdate" and "enddate" variables to the struct "Quest". Since dates are stored as unit variables in solidity and are expressed as the number of seconds since Jan 1st 1970, to calculate the number of days between two given dates, we'll just have to rest them and divide it by 60 (to get the minutes), 60 (to get the hours) and 24 (to get the days), the "startdate" and "enddate" variables were set to type unit. 
