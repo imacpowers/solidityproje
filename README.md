@@ -1,13 +1,21 @@
-# Sample Hardhat Project
+The following functionalities were chosen in a bid to better represent the stackup platform in a contract form.
+"Date and time functionalities"
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+The start date and end date functionalities were added to the contract, this was achieved by including both "startdate" and "enddate" variables to the struct "Quest". Since dates are stored as unit variables in solidity and are expressed as the number of seconds since Jan 1st 1970, to calculate the number of days between two given dates, we'll just have to rest them and divide it by 60 (to get the minutes), 60 (to get the hours) and 24 (to get the days), the "startdate" and "enddate" variables were set to type unit. 
+Including these datafields neccesitated changes in several functions such as the joinQuest and submit quest functions. For the joinquest function, two "require" statements were added to ensure that one couldnt join a quest before the start date and time and that one couldnt join after the end date and time also.
+The change in the submitquest function was the addition of two of same "require" statements that ensured that if one had not joined a quest before the submission date passed, one couldnt submit and the PlayerQuestStatus was set as Not_submitted. However, if one had joined a quest before the submission date passed and one didn't make a submission before the submission date passed, PlayerQuestStatus was set as Not_submitted. Howevr if one joins and submits before the quest's end date, the PlayerQuestStatus is set as SUBMITTED.
 
-Try running some of the following tasks:
+"Edit and Delete functionalities"
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+The first function that was added is the "Edit and Delete" quest functionality, for the edit quest function, it takes six parameters (questId,title_,reward_,numberOfRewards_,startDate_, endDate_) and uses the onlyAdmin and QuestExists modifiers to ensure that only the admin can edit a quest and that a quest exists before we proceed to edit it. The body of the function assigns the new parameters to the quest's datafields.
+The delete quest function takes one parameter (questId)  and uses the onlyAdmin and QuestExists modifiers to ensure that only the admin can delete a quest and that a quest exists before we proceed to delete it.In the body of the function, the quest is deleted from the quests map.
+
+
+"Quest review functionality"
+
+For the Quest review functionality, we added REJECTED, APPROVED, REWARDED, NOT_SUBMITTED to the PlayerQuestStatus enum, then the reviewquestSubmission function was created. This function takes the questId, player, isSubmissionCorrect parameters and uses the onlyAdmin and questExists modifiers to ensure that only the admin can review a quest and that the quest exists.In the body of the function, a require statement is used to ensure that the playerQuestStatus = submitted before the "if" statements execute. These statements ensure that if a submission is correct and the number of rewards for the quest hasn't been exhausted, the PlayerQuestStatus changes to rewarded however, if the rewards have been exhausted, the PlayerQuestStatus changes to approved. However, if the submission is wrong, the PlayerQuestStatus is changed to rejected.The correctness of a submission is based on what the value that the admin assigns to the bool "isSubmissionCorrect".
+
+"Campaign functionality"
+
+In this context, we'll refer to a campaign as a collection of quests under a similar banner. To implement this functionality in our contract, we strive to create a function that can group a number of quests together as being under a campaign. We create a campaign struct which contains the datafields topic, campaignid and a unit256 type array named questids. We then proceeded to create the "create campaign" function. The function takes one parameter "topic_" and uses the onlyAdmin modifier to ensure that only admins can create campaigns. In the body of the function, we assign values to the required variables. Next, we create a "assignquesttocampaign" function, this function takes two parameters QuestId and CampaignId, it also uses a questexists modifier to ensure a quest exists before it is assigned to a campaign. In the body of the function, the id of the quest to be assigned is pushed to the questIds array. To accompany the present functions, a "delete campaign" function is created, the function takes a campaignId parameter and uses the onlyAdmin and campaignExists modifiers to ensure that the quest exists before it can be deleted and that only the admin can delete it.    
+
